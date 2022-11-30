@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.gmall.product.mapper.BaseAttrInfoMapper">
+
+    <!-- 对于重复的字段,手动取别名,没有重复的字段则自动映射 -->
+    <resultMap id="baseAttrInfoMap" type="com.atguigu.gmall.model.product.BaseAttrInfo" autoMapping="true">
+        <!-- 主键映射 -->
+        <id property="id" column="id"/>
+
+        <!-- 一对多映射 -->
+        <collection property="attrValueList" ofType="com.atguigu.gmall.model.product.BaseAttrValue" autoMapping="true">
+            <!-- 将在查询时起的别名映射回去 -->
+            <id property="id" column="attr_value_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAttrInfoList" resultMap="baseAttrInfoMap">
+        SELECT
+            bai.id,
+            bai.attr_name,
+            bai.category_id,
+            bai.category_level,
+            bai.create_time,
+            bai.update_time,
+            bav.id attr_value_id,
+            bav.attr_id,
+            bav.value_name,
+            bav.create_time,
+            bav.update_time
+        FROM
+            gmall_product.base_attr_info bai
+        JOIN
+            gmall_product.base_attr_value bav
+        ON
+            bai.id = bav.attr_id
+        <where>
+
+            <if test="category1Id != null and category1Id != 0">
+                OR (bai.category_id = #{category1Id} AND bai.category_level = 1)
+            </if>
+
+            <if test="category2Id != null and category2Id != 0">
+                OR (bai.category_id = #{category2Id} AND bai.category_level = 2)
+            </if>
+
+            <if test="category3Id != null and category3Id != 0 ">
+                OR (bai.category_id = #{category3Id} AND bai.category_level = 3)
+            </if>
+
+        AND bav.is_deleted = 0 AND bai.is_deleted = 0
+
+        </where>
+        ORDER BY bai.category_level,bai.id
+    </select>
+</mapper>
