@@ -37,9 +37,9 @@
             bai.id = bav.attr_id
 
         <where>
-            (
+
             <if test="category1Id != null and category1Id != 0">
-                bai.category_id = #{category1Id} AND bai.category_level = 1
+                OR bai.category_id = #{category1Id} AND bai.category_level = 1
             </if>
 
             <if test="category2Id != null and category2Id != 0">
@@ -49,7 +49,7 @@
             <if test="category3Id != null and category3Id != 0 ">
                 OR bai.category_id = #{category3Id} AND bai.category_level = 3
             </if>
-            )
+
         AND bav.is_deleted = 0 AND bai.is_deleted = 0
         </where>
         ORDER BY bai.category_level,bai.id
