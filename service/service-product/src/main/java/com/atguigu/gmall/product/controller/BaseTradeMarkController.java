@@ -19,6 +19,19 @@ public class BaseTradeMarkController {
     private BaseTrademarkService baseTrademarkService;
     
     /**
+     * 保存品牌信息
+     *
+     * @param baseTrademark 品牌实体类
+     * @return
+     */
+    @PostMapping("/save")
+    public Result saveTrademark(@RequestBody BaseTrademark baseTrademark) {
+        baseTrademarkService.save(baseTrademark);
+        return Result.ok();
+    }
+    
+    
+    /**
      * 分页查询品牌名称
      *
      * @param page
