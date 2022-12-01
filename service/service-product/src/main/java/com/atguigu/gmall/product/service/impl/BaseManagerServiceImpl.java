@@ -6,6 +6,8 @@ import com.atguigu.gmall.product.service.BaseManagerService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,21 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     
     @Autowired
     private SpuInfoMapper spuInfoMapper;
+    
+    @Autowired
+    private BaseSaleAttrMapper baseSaleAttrMapper;
+    
+    @Autowired
+    private SpuImageMapper spuImageMapper;
+    
+    @Autowired
+    private SpuPosterMapper spuPosterMapper;
+    
+    @Autowired
+    private SpuSaleAttrMapper spuSaleAttrMapper;
+    
+    @Autowired
+    private SpuSaleAttrValueMapper spuSaleAttrValueMapper;
     
     /**
      * 获取一级类别数据
@@ -153,5 +170,73 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         wrapper.eq(SpuInfo::getCategory3Id, spuInfo.getCategory3Id());
         
         return spuInfoMapper.selectPage(page, wrapper);
+    }
+    
+    /**
+     * 获取所有销售属性
+     *
+     * @return
+     */
+    @Override
+    public List<BaseSaleAttr> getSaleAttrList() {
+        return baseSaleAttrMapper.selectList(null);
+    }
+    
+    
+    /**
+     * 保存SPU(商品最小聚合信息)
+     *
+     * @param spuInfo 包含(销售属性/商品图片/商品海报等)一种商品的信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuInfo spuInfo) {
+        /*
+         * spu_info / spu_sale_attr / spu_image / spu_poster / spu_sale_attr_value
+         * 1.保存SpuInfo,并获取回填的id值
+         * 2.判断这个对象中携带的其他属性,遍历后将SpuId填入保存即可
+         * */
+        
+        spuInfoMapper.insert(spuInfo);
+        Long spuInfoId = spuInfo.getId();
+        
+        // 保存商品图片
+        List<SpuImage> spuImageList = spuInfo.getSpuImageList();
+        if (spuImageList != null) {
+            spuImageList.forEach(item -> {
+                item.setSpuId(spuInfoId);
+                spuImageMapper.insert(item);
+            });
+        }
+        
+        // 保存商品海报
+        List<SpuPoster> spuPosterList = spuInfo.getSpuPosterList();
+        if (spuPosterList != null) {
+            spuPosterList.forEach(item -> {
+                item.setSpuId(spuInfoId);
+                spuPosterMapper.insert(item);
+            });
+        }
+        
+        // 保存销售属性
+        List<SpuSaleAttr> spuSaleAttrList = spuInfo.getSpuSaleAttrList();
+        if (spuSaleAttrList != null) {
+            spuSaleAttrList.forEach(spuSaleAttr -> {
+                spuSaleAttr.setSpuId(spuInfoId);
+                spuSaleAttrMapper.insert(spuSaleAttr);
+                
+                // 从每个销售属性中获取对应的销售属性值,添加到销售属性值表(spu_sale_attr_value)中
+                List<SpuSaleAttrValue> spuSaleAttrValueList = spuSaleAttr.getSpuSaleAttrValueList();
+                if (spuSaleAttrValueList != null) {
+                    spuSaleAttrValueList.forEach(spuSaleAttrValue -> {
+                        spuSaleAttrValue.setSpuId(spuInfoId);
+                        spuSaleAttrValue.setBaseSaleAttrId(spuSaleAttr.getId());
+                        spuSaleAttrValue.setSaleAttrValueName(spuSaleAttr.getSaleAttrName());
+                        spuSaleAttrValueMapper.insert(spuSaleAttrValue);
+                    });
+                }
+            });
+        }
+        
     }
 }

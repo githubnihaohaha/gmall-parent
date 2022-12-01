@@ -72,4 +72,18 @@ public interface BaseManagerService {
      * @return IPage<SpuInfo>
      */
     IPage<SpuInfo> getSpuInfoPageList(Page<SpuInfo> page, SpuInfo spuInfo);
+    
+    /**
+     * 获取所有销售属性
+     *
+     * @return
+     */
+    List<BaseSaleAttr> getSaleAttrList();
+    
+    /**
+     * 保存SPU(商品最小聚合信息)
+     *
+     * @param spuInfo 包含(销售属性/商品图片/商品海报等)一种商品的信息
+     */
+    void saveSpuInfo(SpuInfo spuInfo);
 }
