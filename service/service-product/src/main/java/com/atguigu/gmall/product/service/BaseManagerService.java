@@ -86,4 +86,49 @@ public interface BaseManagerService {
      * @param spuInfo 包含(销售属性/商品图片/商品海报等)一种商品的信息
      */
     void saveSpuInfo(SpuInfo spuInfo);
+    
+    /**
+     * 获取商品销售属性值(Spu)
+     *
+     * @param spuId 商品id
+     * @return 某商品对应的多个销售属性及销售属性值
+     */
+    List<SpuSaleAttr> getSpuSaleAttrBySpuId(Long spuId);
+    
+    /**
+     * 分页获取商品库存单元信息
+     *
+     * @param pageParam 分页条件对象
+     * @return IPage 分页结果对象
+     */
+    IPage<SkuInfo> getSkuPageList(Page<SkuInfo> pageParam);
+    
+    /**
+     * 根据商品id查询商品图片
+     *
+     * @param spuId 商品id
+     * @return 商品图片List
+     */
+    List<SpuImage> getSpuImageListBySpuId(Long spuId);
+    
+    /**
+     * 保存具体商品的信息
+     *
+     * @param skuInfo
+     */
+    void saveSkuInfo(SkuInfo skuInfo);
+    
+    /**
+     * 将商品上架状态值更新为1(上架)
+     *
+     * @param skuId 商品库存单元id
+     */
+    void onSaleSku(Long skuId);
+    
+    /**
+     * 将商品上架状态值更新为0(下架)
+     *
+     * @param skuId 库存单元id
+     */
+    void cancelSaleSku(Long skuId);
 }

@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product.service.impl;
 
+import com.atguigu.gmall.model.base.BaseEntity;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.mapper.*;
 import com.atguigu.gmall.product.service.BaseManagerService;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author: liu-wēi
@@ -43,15 +46,21 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     
     @Autowired
     private SpuImageMapper spuImageMapper;
-    
     @Autowired
     private SpuPosterMapper spuPosterMapper;
-    
     @Autowired
     private SpuSaleAttrMapper spuSaleAttrMapper;
-    
     @Autowired
     private SpuSaleAttrValueMapper spuSaleAttrValueMapper;
+    
+    @Autowired
+    private SkuInfoMapper skuInfoMapper;
+    @Autowired
+    private SkuImageMapper skuImageMapper;
+    @Autowired
+    private SkuAttrValueMapper skuAttrValueMapper;
+    @Autowired
+    private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
     
     /**
      * 获取一级类别数据
@@ -189,11 +198,6 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveSpuInfo(SpuInfo spuInfo) {
-        /*
-         * spu_info / spu_sale_attr / spu_image / spu_poster / spu_sale_attr_value
-         * 1.保存SpuInfo,并获取回填的id值
-         * 2.判断这个对象中携带的其他属性,遍历后将SpuId填入保存即可
-         * */
         
         spuInfoMapper.insert(spuInfo);
         Long spuInfoId = spuInfo.getId();
@@ -201,18 +205,18 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         // 保存商品图片
         List<SpuImage> spuImageList = spuInfo.getSpuImageList();
         if (spuImageList != null) {
-            spuImageList.forEach(item -> {
-                item.setSpuId(spuInfoId);
-                spuImageMapper.insert(item);
+            spuImageList.forEach(spuImage -> {
+                spuImage.setSpuId(spuInfoId);
+                spuImageMapper.insert(spuImage);
             });
         }
         
         // 保存商品海报
         List<SpuPoster> spuPosterList = spuInfo.getSpuPosterList();
         if (spuPosterList != null) {
-            spuPosterList.forEach(item -> {
-                item.setSpuId(spuInfoId);
-                spuPosterMapper.insert(item);
+            spuPosterList.forEach(spuPoster -> {
+                spuPoster.setSpuId(spuInfoId);
+                spuPosterMapper.insert(spuPoster);
             });
         }
         
@@ -228,13 +232,130 @@ public class BaseManagerServiceImpl implements BaseManagerService {
                 if (spuSaleAttrValueList != null) {
                     spuSaleAttrValueList.forEach(spuSaleAttrValue -> {
                         spuSaleAttrValue.setSpuId(spuInfoId);
-                        spuSaleAttrValue.setBaseSaleAttrId(spuSaleAttr.getId());
-                        spuSaleAttrValue.setSaleAttrValueName(spuSaleAttr.getSaleAttrName());
                         spuSaleAttrValueMapper.insert(spuSaleAttrValue);
                     });
                 }
             });
         }
+    }
+    
+    
+    /**
+     * 获取商品销售属性值(Spu)
+     *
+     * @param spuId 商品id
+     * @return 某商品对应的多个销售属性及销售属性值
+     */
+    @Override
+    public List<SpuSaleAttr> getSpuSaleAttrBySpuId(Long spuId) {
         
+        return spuSaleAttrMapper.selectSpuSaleAttrListBySpuId(spuId);
+        
+    }
+    
+    
+    /**
+     * 分页获取商品库存单元信息
+     *
+     * @param pageParam 分页条件对象
+     * @return IPage 分页结果对象
+     */
+    @Override
+    public IPage<SkuInfo> getSkuPageList(Page<SkuInfo> pageParam) {
+        LambdaQueryWrapper<SkuInfo> wrapper = new LambdaQueryWrapper<SkuInfo>().orderByDesc(BaseEntity::getId);
+        return skuInfoMapper.selectPage(pageParam, wrapper);
+    }
+    
+    /**
+     * 根据商品id查询商品图片
+     *
+     * @param spuId 商品id
+     * @return 商品图片List
+     */
+    @Override
+    public List<SpuImage> getSpuImageListBySpuId(Long spuId) {
+        LambdaQueryWrapper<SpuImage> wrapper = new LambdaQueryWrapper<SpuImage>()
+                .eq(SpuImage::getSpuId, spuId);
+        return spuImageMapper.selectList(wrapper);
+    }
+    
+    
+    /**
+     * 保存具体商品的信息
+     *
+     * @param skuInfo
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSkuInfo(SkuInfo skuInfo) {
+        // 存入skuInfo
+        skuInfoMapper.insert(skuInfo);
+        Long skuInfoId = skuInfo.getId();
+        
+        // 在集合为null时,输出警告并返回一个初始化的List对象,防止 NPE
+        Optional.ofNullable(skuInfo.getSkuImageList())
+                .orElseGet(() -> {
+                    System.err.println("SkuImageList()为空!!!");
+                    return new ArrayList<>();
+                })
+                .forEach(skuImage -> {
+                    skuImage.setSkuId(skuInfoId);
+                    skuImageMapper.insert(skuImage);
+                });
+        
+        /*
+         * 保存平台属性
+         * 判空后进行操作,orElse为防止NPE的兜底集合,如果原集合为null则使用它来.forEach
+         *
+         * */
+        Optional.ofNullable(skuInfo.getSkuAttrValueList()).orElse(new ArrayList<>())
+                .forEach(skuAttrValue -> {
+                    skuAttrValue.setSkuId(skuInfoId);
+                    skuAttrValueMapper.insert(skuAttrValue);
+                });
+        
+        // 保存销售属性值
+        Optional.ofNullable(skuInfo.getSkuSaleAttrValueList()).orElse(new ArrayList<>())
+                .forEach(skuSaleAttrValue -> {
+                    skuSaleAttrValue.setSkuId(skuInfoId);
+                    skuSaleAttrValue.setSpuId(skuInfo.getSpuId());
+                    skuSaleAttrValueMapper.insert(skuSaleAttrValue);
+                });
+        
+    }
+    
+    
+    /**
+     * 上架商品
+     *
+     * @param skuId 商品库存单元id
+     * @return
+     */
+    @Override
+    public void onSaleSku(Long skuId) {
+        Integer onSaleStatus = 1;
+        
+        SkuInfo skuInfo = new SkuInfo();
+        skuInfo.setIsSale(onSaleStatus);
+        skuInfo.setId(skuId);
+        
+        skuInfoMapper.updateById(skuInfo);
+        
+    }
+    
+    /**
+     * 将商品上架状态值更新为0(下架)
+     *
+     * @param skuId 库存单元id
+     */
+    @Override
+    public void cancelSaleSku(Long skuId) {
+        Integer cancelSaleStatus = 0;
+        
+        SkuInfo skuInfo = new SkuInfo();
+        skuInfo.setId(skuId);
+        skuInfo.setIsSale(cancelSaleStatus);
+        
+        skuInfoMapper.updateById(skuInfo);
     }
 }
