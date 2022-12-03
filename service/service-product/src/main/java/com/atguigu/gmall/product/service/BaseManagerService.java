@@ -157,4 +157,12 @@ public interface BaseManagerService {
      * @return BaseCategoryView 封装了三级分类id及name的对象
      */
     BaseCategoryView getCategoryView(Long category3Id);
+    
+    /**
+     * 查询skuInfo
+     *
+     * @param skuId 商品id
+     * @return SkuInfo
+     */
+    SkuInfo getSkuInfoBySkuId(Long skuId);
 }

@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.controller.api;
 
 import com.atguigu.gmall.model.product.BaseCategoryView;
+import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuPoster;
 import com.atguigu.gmall.product.service.BaseManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class ProductApiController {
     @Autowired
     private BaseManagerService baseManagerService;
     
+    
     /**
      * 获取商品的分类信息
      *
@@ -32,6 +34,17 @@ public class ProductApiController {
     @GetMapping("/getCategoryView/{category3Id}")
     public BaseCategoryView getCategoryView(@PathVariable Long category3Id) {
         return baseManagerService.getCategoryView(category3Id);
+    }
+    
+    /**
+     * 查询skuInfo
+     *
+     * @param skuId 商品id
+     * @return SkuInfo
+     */
+    @GetMapping("/getSkuInfo/{skuId}")
+    public SkuInfo getSkuInfoBySkuId(@PathVariable Long skuId) {
+        return baseManagerService.getSkuInfoBySkuId(skuId);
     }
     
     

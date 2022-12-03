@@ -402,4 +402,22 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     public BaseCategoryView getCategoryView(Long category3Id) {
         return baseCategoryViewMapper.getCategoryView(category3Id);
     }
+    
+    /**
+     * 查询skuInfo
+     *
+     * @param skuId 商品id
+     * @return SkuInfo
+     */
+    @Override
+    public SkuInfo getSkuInfoBySkuId(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        if (skuInfo != null) {
+            LambdaQueryWrapper<SkuImage> wrapper = new LambdaQueryWrapper<SkuImage>()
+                    .eq(SkuImage::getSkuId, skuId);
+            
+            skuInfo.setSkuImageList(skuImageMapper.selectList(wrapper));
+        }
+        return skuInfo;
+    }
 }
