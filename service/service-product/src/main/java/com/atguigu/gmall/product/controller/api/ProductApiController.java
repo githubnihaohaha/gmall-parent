@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product.controller.api;
 
+import com.atguigu.gmall.model.product.BaseAttrInfo;
 import com.atguigu.gmall.model.product.BaseCategoryView;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuPoster;
@@ -23,6 +24,16 @@ public class ProductApiController {
     
     @Autowired
     private BaseManagerService baseManagerService;
+    
+    /**
+     * 查询平台属性
+     * @param skuId 商品id
+     * @return
+     */
+    @GetMapping("/getAttrList/{skuId}")
+    public List<BaseAttrInfo> getAttrList(@PathVariable Long skuId) {
+        return baseManagerService.getAttrListBySkuId(skuId);
+    }
     
     
     /**

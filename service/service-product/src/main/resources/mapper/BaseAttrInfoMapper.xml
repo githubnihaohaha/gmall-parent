@@ -55,4 +55,18 @@
         </where>
         ORDER BY bai.category_level,bai.id
     </select>
+
+    <select id="getAttrListBySkuId" resultMap="baseAttrInfoMap">
+        SELECT bai.attr_name,
+               bai.category_id,
+               bai.category_level,
+               bai.id,
+               bav.attr_id,
+               bav.id attr_value_id,
+               bav.value_name
+        FROM gmall_product.sku_attr_value sav
+                 JOIN gmall_product.base_attr_info bai ON sav.attr_id = bai.id
+                 JOIN gmall_product.base_attr_value bav ON sav.value_id = bav.id
+        WHERE sav.sku_id = #{skuId}
+    </select>
 </mapper>

@@ -420,4 +420,15 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         }
         return skuInfo;
     }
+    
+    /**
+     * 根据商品id查询出对应的平台属性
+     *
+     * @param skuId 商品id
+     * @return 平台属性集合
+     */
+    @Override
+    public List<BaseAttrInfo> getAttrListBySkuId(Long skuId) {
+        return baseAttrInfoMapper.getAttrListBySkuId(skuId);
+    }
 }

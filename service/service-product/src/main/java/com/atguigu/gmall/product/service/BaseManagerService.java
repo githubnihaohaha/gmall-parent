@@ -165,4 +165,12 @@ public interface BaseManagerService {
      * @return SkuInfo
      */
     SkuInfo getSkuInfoBySkuId(Long skuId);
+    
+    /**
+     * 根据商品id查询出对应的平台属性
+     *
+     * @param skuId 商品id
+     * @return 平台属性集合
+     */
+    List<BaseAttrInfo> getAttrListBySkuId(Long skuId);
 }
