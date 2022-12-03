@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -357,5 +358,34 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         skuInfo.setIsSale(cancelSaleStatus);
         
         skuInfoMapper.updateById(skuInfo);
+    }
+    
+    
+    /**
+     * 通过spuId来获取对应的海报信息
+     *
+     * @param spuId 商品id
+     * @return spuId符合条件的海报集合
+     */
+    @Override
+    public List<SpuPoster> getSpuPosterListBySpuId(Long spuId) {
+        LambdaQueryWrapper<SpuPoster> wrapper = new LambdaQueryWrapper<SpuPoster>().eq(SpuPoster::getSpuId, spuId);
+        return spuPosterMapper.selectList(wrapper);
+    }
+    
+    
+    /**
+     * 根据具体商品的id获取最新的售价
+     *
+     * @param skuId 给定了具体销售属性值的商品id
+     * @return BigDecimal类型的售价
+     */
+    @Override
+    public BigDecimal getSkuPriceBySkuId(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        if (skuInfo != null) {
+            return skuInfo.getPrice();
+        }
+        return BigDecimal.ZERO;
     }
 }

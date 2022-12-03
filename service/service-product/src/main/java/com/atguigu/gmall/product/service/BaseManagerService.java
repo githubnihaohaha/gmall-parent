@@ -4,6 +4,7 @@ import com.atguigu.gmall.model.product.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -131,4 +132,21 @@ public interface BaseManagerService {
      * @param skuId 库存单元id
      */
     void cancelSaleSku(Long skuId);
+    
+    
+    /**
+     * 通过spuId来获取对应的海报信息
+     *
+     * @param spuId 商品id
+     * @return spuId符合条件的海报集合
+     */
+    List<SpuPoster> getSpuPosterListBySpuId(Long spuId);
+    
+    /**
+     * 根据具体商品的id获取最新的售价
+     *
+     * @param skuId 给定了具体销售属性值的商品id
+     * @return BigDecimal类型的售价
+     */
+    BigDecimal getSkuPriceBySkuId(Long skuId);
 }
