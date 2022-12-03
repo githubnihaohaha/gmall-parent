@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product.controller.api;
 
+import com.atguigu.gmall.model.product.BaseCategoryView;
 import com.atguigu.gmall.model.product.SpuPoster;
 import com.atguigu.gmall.product.service.BaseManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,17 @@ public class ProductApiController {
     
     @Autowired
     private BaseManagerService baseManagerService;
+    
+    /**
+     * 获取商品的分类信息
+     *
+     * @param category3Id 三级分类id
+     * @return BaseCategoryView 封装了三级分类id及name的对象
+     */
+    @GetMapping("/getCategoryView/{category3Id}")
+    public BaseCategoryView getCategoryView(@PathVariable Long category3Id) {
+        return baseManagerService.getCategoryView(category3Id);
+    }
     
     
     /**

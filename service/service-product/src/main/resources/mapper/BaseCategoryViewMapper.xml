@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.gmall.product.mapper.BaseCategoryViewMapper">
+
+    <select id="getCategoryView" resultType="com.atguigu.gmall.model.product.BaseCategoryView">
+        select *
+        from gmall_product.base_category_view
+        where base_category_view.id = #{category3Id}
+    </select>
+</mapper>

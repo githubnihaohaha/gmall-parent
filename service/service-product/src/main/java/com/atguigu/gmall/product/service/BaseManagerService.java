@@ -149,4 +149,12 @@ public interface BaseManagerService {
      * @return BigDecimal类型的售价
      */
     BigDecimal getSkuPriceBySkuId(Long skuId);
+    
+    /**
+     * 获取商品的分类信息
+     *
+     * @param category3Id 三级分类id
+     * @return BaseCategoryView 封装了三级分类id及name的对象
+     */
+    BaseCategoryView getCategoryView(Long category3Id);
 }

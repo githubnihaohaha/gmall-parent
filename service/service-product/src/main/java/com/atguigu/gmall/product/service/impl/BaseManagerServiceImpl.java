@@ -63,6 +63,9 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     @Autowired
     private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
     
+    @Autowired
+    private BaseCategoryViewMapper baseCategoryViewMapper;
+    
     /**
      * 获取一级类别数据
      *
@@ -387,5 +390,16 @@ public class BaseManagerServiceImpl implements BaseManagerService {
             return skuInfo.getPrice();
         }
         return BigDecimal.ZERO;
+    }
+    
+    /**
+     * 获取商品的分类信息
+     *
+     * @param category3Id 三级分类id
+     * @return BaseCategoryView 封装了三级分类id及name的对象
+     */
+    @Override
+    public BaseCategoryView getCategoryView(Long category3Id) {
+        return baseCategoryViewMapper.getCategoryView(category3Id);
     }
 }
