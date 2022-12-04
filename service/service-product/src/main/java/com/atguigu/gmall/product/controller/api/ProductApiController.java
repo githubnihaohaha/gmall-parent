@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: liu-wēi
@@ -26,7 +27,19 @@ public class ProductApiController {
     private BaseManagerService baseManagerService;
     
     /**
+     * 根据spuId查询所有对应的sku关系,以特定的Json格式返回
+     *
+     * @param spuId
+     * @return keyValue格式为 "属性值1|属性值2":"1" 的map
+     */
+    @GetMapping("/getSkuValueIdsMap/{spuId}")
+    public Map getSkuValueIdsMap(@PathVariable Long spuId) {
+        return baseManagerService.getSkuValueIdsMap(spuId);
+    }
+    
+    /**
      * 查询平台属性
+     *
      * @param skuId 商品id
      * @return
      */

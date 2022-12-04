@@ -10,12 +10,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author: liu-wēi
@@ -430,5 +428,23 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     @Override
     public List<BaseAttrInfo> getAttrListBySkuId(Long skuId) {
         return baseAttrInfoMapper.getAttrListBySkuId(skuId);
+    }
+    
+    /**
+     * 根据spuId查询所有对应的sku关系,以特定的Json格式返回
+     *
+     * @param spuId
+     * @return keyValue格式为 "属性值1|属性值2":"1" 的map
+     */
+    @Override
+    public Map getSkuValueIdsMap(Long spuId) {
+        Map<Object, Object> resultMap = new HashMap<>();
+        List<Map> allSkuMapList = skuSaleAttrValueMapper.getSkuValueIdsMap(spuId);
+        
+        Optional.ofNullable(allSkuMapList).orElse(new ArrayList<>())
+                .stream()
+                .forEach(map -> resultMap.put(map.get("value_ids"), map.get("sku_id")));
+        
+        return resultMap;
     }
 }
