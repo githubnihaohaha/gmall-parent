@@ -234,6 +234,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
                 if (spuSaleAttrValueList != null) {
                     spuSaleAttrValueList.forEach(spuSaleAttrValue -> {
                         spuSaleAttrValue.setSpuId(spuInfoId);
+                        spuSaleAttrValue.setSaleAttrValueName(spuSaleAttr.getSaleAttrName());
                         spuSaleAttrValueMapper.insert(spuSaleAttrValue);
                     });
                 }
