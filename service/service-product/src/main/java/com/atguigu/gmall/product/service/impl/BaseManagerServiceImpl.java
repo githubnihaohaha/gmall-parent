@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -447,5 +446,17 @@ public class BaseManagerServiceImpl implements BaseManagerService {
                 .forEach(map -> resultMap.put(map.get("value_ids"), map.get("sku_id")));
         
         return resultMap;
+    }
+    
+    /**
+     * 查询商品的所有销售属性及销售属性值
+     *
+     * @param skuId
+     * @param spuId
+     * @return
+     */
+    @Override
+    public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId) {
+        return spuSaleAttrMapper.getSpuSaleAttrListCheckBySku(skuId,spuId);
     }
 }

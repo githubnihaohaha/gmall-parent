@@ -182,4 +182,13 @@ public interface BaseManagerService {
      * @return keyValue格式为 "属性值1|属性值2":"1" 的map
      */
     Map getSkuValueIdsMap(Long spuId);
+    
+    /**
+     * 查询商品的所有销售属性及销售属性值
+     *
+     * @param skuId
+     * @param spuId
+     * @return
+     */
+    List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId);
 }

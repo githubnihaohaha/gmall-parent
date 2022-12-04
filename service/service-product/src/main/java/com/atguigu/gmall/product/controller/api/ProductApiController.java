@@ -1,9 +1,6 @@
 package com.atguigu.gmall.product.controller.api;
 
-import com.atguigu.gmall.model.product.BaseAttrInfo;
-import com.atguigu.gmall.model.product.BaseCategoryView;
-import com.atguigu.gmall.model.product.SkuInfo;
-import com.atguigu.gmall.model.product.SpuPoster;
+import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.service.BaseManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +22,19 @@ public class ProductApiController {
     
     @Autowired
     private BaseManagerService baseManagerService;
+    
+    /**
+     * 查询商品的所有销售属性及属性值
+     *
+     * @param skuId
+     * @param spuId
+     * @return
+     */
+    @GetMapping("/getSpuSaleAttrListCheckBySku/{skuId}/{spuId}")
+    public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(@PathVariable Long skuId,
+                                                          @PathVariable Long spuId) {
+        return baseManagerService.getSpuSaleAttrListCheckBySku(skuId, spuId);
+    }
     
     /**
      * 根据spuId查询所有对应的sku关系,以特定的Json格式返回
