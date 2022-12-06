@@ -1,5 +1,7 @@
 package com.atguigu.gmall.product.service.impl;
 
+import com.atguigu.gmall.common.cache.GmallCache;
+import com.atguigu.gmall.common.constant.RedisConst;
 import com.atguigu.gmall.model.base.BaseEntity;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.mapper.*;
@@ -8,6 +10,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +68,9 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     
     @Autowired
     private BaseCategoryViewMapper baseCategoryViewMapper;
+    
+    @Autowired
+    private RedissonClient redissonClient;
     
     /**
      * 获取一级类别数据
@@ -285,7 +293,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
     /**
      * 保存具体商品的信息
      *
-     * @param skuInfo
+     * @param skuInfo 指定了销售属性及销售属性值的具体商品
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -324,6 +332,10 @@ public class BaseManagerServiceImpl implements BaseManagerService {
                     skuSaleAttrValueMapper.insert(skuSaleAttrValue);
                 });
         
+        
+        // 添加商品成功后,将他的id存入布隆过滤器中,作为今后查询访问时判断是否存在数据的依据
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(RedisConst.SKU_BLOOM_FILTER);
+        bloomFilter.add(skuInfoId);
     }
     
     
@@ -369,6 +381,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return spuId符合条件的海报集合
      */
     @Override
+    @GmallCache(prefix = "spuPosterListBySpuId:")
     public List<SpuPoster> getSpuPosterListBySpuId(Long spuId) {
         LambdaQueryWrapper<SpuPoster> wrapper = new LambdaQueryWrapper<SpuPoster>().eq(SpuPoster::getSpuId, spuId);
         return spuPosterMapper.selectList(wrapper);
@@ -383,10 +396,20 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      */
     @Override
     public BigDecimal getSkuPriceBySkuId(Long skuId) {
-        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
-        if (skuInfo != null) {
-            return skuInfo.getPrice();
+        
+        RLock lock = redissonClient.getLock(skuId + RedisConst.SKULOCK_SUFFIX);
+        lock.lock();
+        
+        // 加锁访问数据库
+        try {
+            SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+            if (skuInfo != null) {
+                return skuInfo.getPrice();
+            }
+        } finally {
+            lock.unlock();
         }
+        
         return BigDecimal.ZERO;
     }
     
@@ -397,6 +420,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return BaseCategoryView 封装了三级分类id及name的对象
      */
     @Override
+    @GmallCache(prefix = "categoryView:")
     public BaseCategoryView getCategoryView(Long category3Id) {
         return baseCategoryViewMapper.getCategoryView(category3Id);
     }
@@ -408,6 +432,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return SkuInfo
      */
     @Override
+    @GmallCache(prefix = "skuInfoBySkuId:")
     public SkuInfo getSkuInfoBySkuId(Long skuId) {
         SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
         if (skuInfo != null) {
@@ -426,6 +451,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return 平台属性集合
      */
     @Override
+    @GmallCache(prefix = "attrListBySkuId:")
     public List<BaseAttrInfo> getAttrListBySkuId(Long skuId) {
         return baseAttrInfoMapper.getAttrListBySkuId(skuId);
     }
@@ -437,6 +463,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return keyValue格式为 "属性值1|属性值2":"1" 的map
      */
     @Override
+    @GmallCache(prefix = "skuValueIdsMap:")
     public Map getSkuValueIdsMap(Long spuId) {
         Map<Object, Object> resultMap = new HashMap<>();
         List<Map> allSkuMapList = skuSaleAttrValueMapper.getSkuValueIdsMap(spuId);
@@ -456,6 +483,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      * @return
      */
     @Override
+    @GmallCache(prefix = "spuSaleAttrListCheckBySku:")
     public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId) {
         return spuSaleAttrMapper.getSpuSaleAttrListCheckBySku(skuId, spuId);
     }
