@@ -6,6 +6,7 @@ import com.atguigu.gmall.product.mapper.*;
 import com.atguigu.gmall.product.service.BaseManagerService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,8 +83,8 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      */
     @Override
     public List<BaseCategory2> getCategory2ByCategory1Id(Long category1Id) {
-        LambdaQueryWrapper<BaseCategory2> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BaseCategory2::getCategory1Id, category1Id);
+        LambdaQueryWrapper<BaseCategory2> wrapper = Wrappers.lambdaQuery(BaseCategory2.class)
+                .eq(BaseCategory2::getCategory1Id, category1Id);
         return baseCategory2Mapper.selectList(wrapper);
     }
     
@@ -96,8 +97,8 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      */
     @Override
     public List<BaseCategory3> getCategory3ByCategory2Id(Long category2Id) {
-        LambdaQueryWrapper<BaseCategory3> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BaseCategory3::getCategory2Id, category2Id);
+        LambdaQueryWrapper<BaseCategory3> wrapper = Wrappers.lambdaQuery(BaseCategory3.class)
+                .eq(BaseCategory3::getCategory2Id, category2Id);
         return baseCategory3Mapper.selectList(wrapper);
     }
     
@@ -114,7 +115,6 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         
         return baseAttrInfoMapper.selectAttrInfoList(category1Id, category2Id, category3Id);
         
-        
     }
     
     
@@ -123,7 +123,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      *
      * @param attrInfo BaseAttrInfo实体类
      */
-    @Transactional(rollbackFor = Exception.class) // 开启事务,所有异常都回滚
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveOrUpdateBaseAttrInfo(BaseAttrInfo attrInfo) {
         
@@ -132,8 +132,8 @@ public class BaseManagerServiceImpl implements BaseManagerService {
             baseAttrInfoMapper.insert(attrInfo);
         } else {
             // id 不为空
-            LambdaQueryWrapper<BaseAttrValue> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(BaseAttrValue::getAttrId, attrInfo.getId());
+            LambdaQueryWrapper<BaseAttrValue> wrapper = Wrappers.lambdaQuery(BaseAttrValue.class)
+                    .eq(BaseAttrValue::getAttrId, attrInfo.getId());
             baseAttrValueMapper.delete(wrapper);
             baseAttrInfoMapper.updateById(attrInfo);
         }
@@ -233,7 +233,7 @@ public class BaseManagerServiceImpl implements BaseManagerService {
                 if (spuSaleAttrValueList != null) {
                     spuSaleAttrValueList.forEach(spuSaleAttrValue -> {
                         spuSaleAttrValue.setSpuId(spuInfoId);
-                        spuSaleAttrValue.setSaleAttrValueName(spuSaleAttr.getSaleAttrName());
+                        spuSaleAttrValue.setSaleAttrName(spuSaleAttr.getSaleAttrName());
                         spuSaleAttrValueMapper.insert(spuSaleAttrValue);
                     });
                 }
@@ -457,6 +457,6 @@ public class BaseManagerServiceImpl implements BaseManagerService {
      */
     @Override
     public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId) {
-        return spuSaleAttrMapper.getSpuSaleAttrListCheckBySku(skuId,spuId);
+        return spuSaleAttrMapper.getSpuSaleAttrListCheckBySku(skuId, spuId);
     }
 }

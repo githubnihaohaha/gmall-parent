@@ -6,11 +6,13 @@ import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.client.ProductFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author: liu-wēi
@@ -59,11 +61,21 @@ public class ItemServiceImpl implements ItemService {
         }
         // 价格
         BigDecimal skuPrice = productFeignClient.getSkuPriceBySkuId(skuId);
-        resultMap.put("skuPrice", skuPrice);
+        resultMap.put("price", skuPrice);
         
         // 商品的平台属性
-        List<BaseAttrInfo> attrList = productFeignClient.getAttrList(skuId);
-        resultMap.put("skuAttrList", attrList);
+        List<BaseAttrInfo> skuAttrList = productFeignClient.getAttrList(skuId);
+        
+        // 前端遍历spuSaleAttrList后直接使用skuAttr.attrName进行取值,所以要对他进行封装
+        if (!CollectionUtils.isEmpty(skuAttrList)) {
+            List<Map<String, String>> mapList = skuAttrList.stream().map(attrInfo -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("attrName", attrInfo.getAttrName());
+                map.put("attrValue", attrInfo.getAttrValueList().get(0).getValueName());
+                return map;
+            }).collect(Collectors.toList());
+            resultMap.put("skuAttrList", mapList);
+        }
         
         return resultMap;
     }
