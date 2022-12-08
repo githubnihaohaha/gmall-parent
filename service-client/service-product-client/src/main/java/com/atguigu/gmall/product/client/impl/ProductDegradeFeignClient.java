@@ -1,5 +1,6 @@
 package com.atguigu.gmall.product.client.impl;
 
+import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.client.ProductFeignClient;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,16 @@ import java.util.Map;
  */
 @Component
 public class ProductDegradeFeignClient implements ProductFeignClient {
+    /**
+     * 获取首页分类数据
+     *
+     * @return 按不同层级不同类型封装的数据
+     */
+    @Override
+    public Result getCategoryList() {
+        return null;
+    }
+    
     /**
      * 查询商品的所有销售属性及属性值
      *

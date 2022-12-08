@@ -1,5 +1,7 @@
 package com.atguigu.gmall.product.client;
 
+import com.alibaba.fastjson.JSONObject;
+import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.product.client.impl.ProductDegradeFeignClient;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,6 +18,15 @@ import java.util.Map;
  */
 @FeignClient(value = "service-product", fallback = ProductDegradeFeignClient.class)
 public interface ProductFeignClient {
+    
+    
+    /**
+     * 获取首页分类数据
+     *
+     * @return 按不同层级不同类型封装的数据
+     */
+    @GetMapping("/api/product/getBaseCategoryList")
+    public Result getCategoryList();
     
     /**
      * 查询商品的所有销售属性及属性值

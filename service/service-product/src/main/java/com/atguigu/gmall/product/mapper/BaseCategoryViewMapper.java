@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.mapper;
 
 import com.atguigu.gmall.model.product.BaseCategoryView;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Repository;
  * @date: 2022/12/3,20:53
  */
 @Repository
-public interface BaseCategoryViewMapper {
+public interface BaseCategoryViewMapper extends BaseMapper<BaseCategoryView> {
     /**
      * 获取商品分类信息
      *
