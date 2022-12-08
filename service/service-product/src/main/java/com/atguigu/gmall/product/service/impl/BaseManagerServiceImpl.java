@@ -509,50 +509,50 @@ public class BaseManagerServiceImpl implements BaseManagerService {
         List<BaseCategoryView> categoryViews = baseCategoryViewMapper.selectList(Wrappers.emptyWrapper());
         
         // 存放结果的集合
-        ArrayList<JSONObject> objectArrayList = new ArrayList<>();
+        ArrayList<JSONObject> packageLevelOneList = new ArrayList<>();
         
         // 初始化index
         AtomicInteger index = new AtomicInteger(0);
         
         // 将数据使用一级id进行分组
-        Map<Long, List<BaseCategoryView>> groupBy1IdViewMap = categoryViews.stream().collect(Collectors.groupingBy(BaseCategoryView::getCategory1Id));
+        Map<Long, List<BaseCategoryView>> viewMapGroupByCategoryOneId = categoryViews.stream().collect(Collectors.groupingBy(BaseCategoryView::getCategory1Id));
         
         // 封装数据(每个一级分类下有多个二级分类,二级分类下有多个三级分类,将这些子分类保存至Child中)
-        groupBy1IdViewMap.forEach((key, categoryViewsList1) -> {
+        viewMapGroupByCategoryOneId.forEach((key, levelOneCategoryList) -> {
             // 一级分类
-            JSONObject category1JsonObj = new JSONObject();
-            category1JsonObj.put(categoryId, key);
-            category1JsonObj.put(categoryName, categoryViewsList1.get(0).getCategory1Name());
-            category1JsonObj.put("index", index);
+            JSONObject firstCategoryJsonObj = new JSONObject();
+            firstCategoryJsonObj.put(categoryId, key);
+            firstCategoryJsonObj.put(categoryName, levelOneCategoryList.get(0).getCategory1Name());
+            firstCategoryJsonObj.put("index", index);
             
             index.incrementAndGet(); // index +1
             
             // 封装每个一级分类下的所有二级分类
-            Map<Long, List<BaseCategoryView>> groupBy2IdViewMap = categoryViewsList1.stream().collect(Collectors.groupingBy(BaseCategoryView::getCategory2Id));
-            ArrayList<JSONObject> category2List = new ArrayList<>();
-            groupBy2IdViewMap.forEach((key1, categoryViewsList2) -> {
-                JSONObject category2JsonObj = new JSONObject();
-                category2JsonObj.put(categoryId, key);
-                category2JsonObj.put(categoryName, categoryViewsList2.get(0).getCategory2Name());
+            Map<Long, List<BaseCategoryView>> levelTwoCategoryList = levelOneCategoryList.stream().collect(Collectors.groupingBy(BaseCategoryView::getCategory2Id));
+            ArrayList<JSONObject> packageLevelTwoList = new ArrayList<>();
+            levelTwoCategoryList.forEach((key1, categoryViewsList2) -> {
+                JSONObject secondCategoryJsonObj = new JSONObject();
+                secondCategoryJsonObj.put(categoryId, key);
+                secondCategoryJsonObj.put(categoryName, categoryViewsList2.get(0).getCategory2Name());
                 
                 // 封装每个二级分类下的三级分类
-                ArrayList<JSONObject> category3List = new ArrayList<>();
+                ArrayList<JSONObject> packageLevelThirdList = new ArrayList<>();
                 categoryViewsList2.forEach(category3 -> {
-                    JSONObject category3JsonObj = new JSONObject();
-                    category3JsonObj.put(categoryId, category3.getCategory3Id());
-                    category3JsonObj.put(categoryName, category3.getCategory3Name());
-                    category3List.add(category3JsonObj);
+                    JSONObject thirdCategoryJsonObj = new JSONObject();
+                    thirdCategoryJsonObj.put(categoryId, category3.getCategory3Id());
+                    thirdCategoryJsonObj.put(categoryName, category3.getCategory3Name());
+                    packageLevelThirdList.add(thirdCategoryJsonObj);
                 });
-                category2JsonObj.put(categoryChild, category3List);
+                secondCategoryJsonObj.put(categoryChild, packageLevelThirdList);
                 
                 
-                category2List.add(category2JsonObj);
+                packageLevelTwoList.add(secondCategoryJsonObj);
             });
             
-            category1JsonObj.put(categoryChild, category2List);
+            firstCategoryJsonObj.put(categoryChild, packageLevelTwoList);
             
-            objectArrayList.add(category1JsonObj);
+            packageLevelOneList.add(firstCategoryJsonObj);
         });
-        return objectArrayList;
+        return packageLevelOneList;
     }
 }
