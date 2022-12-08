@@ -17,7 +17,7 @@ import java.util.Map;
  * @date: 2022/12/3,17:30
  */
 @RestController
-@RequestMapping("/api/product/inner")
+@RequestMapping("/api/product")
 public class ProductApiController {
     
     @Autowired
@@ -30,7 +30,7 @@ public class ProductApiController {
      * @param spuId
      * @return
      */
-    @GetMapping("/getSpuSaleAttrListCheckBySku/{skuId}/{spuId}")
+    @GetMapping("/inner/getSpuSaleAttrListCheckBySku/{skuId}/{spuId}")
     public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(@PathVariable Long skuId,
                                                           @PathVariable Long spuId) {
         return baseManagerService.getSpuSaleAttrListCheckBySku(skuId, spuId);
@@ -42,7 +42,7 @@ public class ProductApiController {
      * @param spuId
      * @return keyValue格式为 "属性值1|属性值2":"1" 的map
      */
-    @GetMapping("/getSkuValueIdsMap/{spuId}")
+    @GetMapping("/inner/getSkuValueIdsMap/{spuId}")
     public Map getSkuValueIdsMap(@PathVariable Long spuId) {
         return baseManagerService.getSkuValueIdsMap(spuId);
     }
@@ -53,7 +53,7 @@ public class ProductApiController {
      * @param skuId 商品id
      * @return
      */
-    @GetMapping("/getAttrList/{skuId}")
+    @GetMapping("/inner/getAttrList/{skuId}")
     public List<BaseAttrInfo> getAttrList(@PathVariable Long skuId) {
         return baseManagerService.getAttrListBySkuId(skuId);
     }
@@ -65,7 +65,7 @@ public class ProductApiController {
      * @param category3Id 三级分类id
      * @return BaseCategoryView 封装了三级分类id及name的对象
      */
-    @GetMapping("/getCategoryView/{category3Id}")
+    @GetMapping("/inner/getCategoryView/{category3Id}")
     public BaseCategoryView getCategoryView(@PathVariable Long category3Id) {
         return baseManagerService.getCategoryView(category3Id);
     }
@@ -76,7 +76,7 @@ public class ProductApiController {
      * @param skuId 商品id
      * @return SkuInfo
      */
-    @GetMapping("/getSkuInfo/{skuId}")
+    @GetMapping("/inner/getSkuInfo/{skuId}")
     public SkuInfo getSkuInfoBySkuId(@PathVariable Long skuId) {
         return baseManagerService.getSkuInfoBySkuId(skuId);
     }
@@ -88,7 +88,7 @@ public class ProductApiController {
      * @param spuId 商品id
      * @return spuId符合条件的海报集合
      */
-    @GetMapping("/findSpuPosterBySpuId/{spuId}")
+    @GetMapping("/inner/findSpuPosterBySpuId/{spuId}")
     public List<SpuPoster> findSpuPosterBySpuId(@PathVariable Long spuId) {
         return baseManagerService.getSpuPosterListBySpuId(spuId);
     }
@@ -100,7 +100,7 @@ public class ProductApiController {
      * @param skuId 给定了具体销售属性值的商品id
      * @return BigDecimal类型的售价
      */
-    @GetMapping("/getSkuPrice/{skuId}")
+    @GetMapping("/inner/getSkuPrice/{skuId}")
     public BigDecimal getSkuPriceBySkuId(@PathVariable Long skuId) {
         return baseManagerService.getSkuPriceBySkuId(skuId);
     }

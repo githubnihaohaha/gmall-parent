@@ -21,7 +21,7 @@ public class ItemController {
     private ItemFeignClient itemFeignClient;
     
     /**
-     * 商品详情也展示
+     * 商品详情页展示
      *
      * @param skuId 商品id
      * @param model 数据共享对象
